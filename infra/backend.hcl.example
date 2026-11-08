@@ -1,0 +1,11 @@
+# Copy to backend.hcl and fill in real values. Never commit backend.hcl.
+# Access/secret keys come from the R2_ACCESS_KEY_ID / R2_SECRET_ACCESS_KEY env vars.
+bucket                       = "tendai-dev-terraform-state"
+key                          = "tendai-dev/terraform.tfstate"
+region                       = "auto"
+endpoint                     = "https://<YOUR_ACCOUNT_ID>.r2.cloudflarestorage.com"
+skip_credentials_validation  = true
+skip_region_validation       = true
+skip_requesting_account_id   = true
+skip_s3_checksum             = true
+force_path_style             = true

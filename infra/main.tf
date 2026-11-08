@@ -5,6 +5,11 @@ terraform {
       version = "~> 5.0"
     }
   }
+
+  # Remote state in Cloudflare R2 (S3-compatible). Configured via backend.hcl
+  # locally, or `-backend-config` flags in CI. Credentials come from
+  # AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY (R2 API tokens).
+  backend "s3" {}
 }
 
 provider "cloudflare" {
