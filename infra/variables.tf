@@ -1,11 +1,16 @@
 variable "cloudflare_api_token" {
-  description = "Cloudflare API token (Account > Cloudflare Pages Edit, Zone > DNS Edit)."
+  description = "Cloudflare API token with Pages Write and DNS Edit permissions."
   type        = string
   sensitive   = true
 }
 
 variable "cloudflare_account_id" {
-  description = "Cloudflare account ID (shown on the Pages dashboard / API tokens page)."
+  description = "Cloudflare account ID."
+  type        = string
+}
+
+variable "zone_id" {
+  description = "Cloudflare zone ID for the domain."
   type        = string
 }
 
