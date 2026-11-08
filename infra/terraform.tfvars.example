@@ -1,0 +1,4 @@
+# Copy to terraform.tfvars and fill in real values. Never commit terraform.tfvars.
+cloudflare_api_token  = "YOUR_API_TOKEN"
+cloudflare_account_id = "YOUR_ACCOUNT_ID"
+# domain, github_owner, and github_repo_name have defaults in variables.tf.
