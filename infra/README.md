@@ -25,16 +25,14 @@ In the repo → **Settings → Secrets and variables → Actions**, add:
 | `R2_SECRET_ACCESS_KEY` | R2 secret access key |
 | `R2_BUCKET` | `tendai-dev-terraform-state` |
 
-### 4. Migrate local state into R2 (once)
-```bash
-cd infra
-cp backend.hcl.example backend.hcl   # fill in your account ID
-export AWS_ACCESS_KEY_ID="<R2 access key id>"
-export AWS_SECRET_ACCESS_KEY="<R2 secret access key>"
-terraform init -backend-config=backend.hcl -migrate-state
-```
+### 4. Adopt the existing resources into R2 state
+
+No local Terraform command is required. On the next push to `main`, the GitHub
+Actions workflow imports the already-created Pages project, domains, and DNS
+records into the R2 backend before applying. Imports are skipped once each
+resource is present in state.
 
 ## Local usage
-After migration, use the same `-backend-config=backend.hcl` for any local
-`init`/`plan`/`apply`. For day-to-day site edits, just commit and push; the
-workflow handles the rest.
+For day-to-day site edits, commit and push; GitHub Actions handles the
+infrastructure plan/apply. The optional `backend.hcl.example` is only for
+manual local Terraform work.

@@ -15,7 +15,8 @@ permissions:
   contents: read
 
 jobs:
-  terraform:
+  terraform-apply:
+    name: Terraform Apply
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -28,10 +29,10 @@ jobs:
       AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
+        uses: hashicorp/setup-terraform@v4
         with:
           terraform_version: 1.17.1
 
@@ -53,6 +54,35 @@ jobs:
 
       - name: Terraform Validate
         run: terraform validate
+
+      # The Pages project and DNS records were originally created before the
+      # R2 backend existed. Adopt them into the remote state on pushes. The
+      # state-show checks make this step safe on every subsequent push.
+      - name: Adopt existing Cloudflare resources into R2 state
+        if: github.event_name == 'push'
+        shell: bash
+        run: |
+          import_if_unmanaged() {
+            local address="$1"
+            local id="$2"
+
+            if terraform state show "$address" >/dev/null 2>&1; then
+              echo "$address is already in state"
+            else
+              terraform import -input=false "$address" "$id"
+            fi
+          }
+
+          import_if_unmanaged cloudflare_pages_project.site \
+            "${TF_VAR_cloudflare_account_id}/tendai-dev"
+          import_if_unmanaged cloudflare_pages_domain.apex \
+            "${TF_VAR_cloudflare_account_id}/tendai-dev/tendai.dev"
+          import_if_unmanaged cloudflare_pages_domain.www \
+            "${TF_VAR_cloudflare_account_id}/tendai-dev/www.tendai.dev"
+          import_if_unmanaged cloudflare_dns_record.apex \
+            "${TF_VAR_zone_id}/59b64d156dcf28dd404b6fa37724f703"
+          import_if_unmanaged cloudflare_dns_record.www \
+            "${TF_VAR_zone_id}/b528eba2f9ca8da443656e83c3e1a1af"
 
       - name: Terraform Plan
         if: github.event_name == 'pull_request'
